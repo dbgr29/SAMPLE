@@ -20,18 +20,35 @@
             android:orientation="vertical"
             android:padding="@dimen/spacing_large">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Update Risk Factors"
-                android:textColor="#D81B60"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    app:tint="#D81B60"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Update Risk Factors"
+                    android:textColor="#D81B60"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
                 android:text="Please complete this medical history questionnaire. This information will be shared securely with your doctor."
                 android:textColor="#757575"
@@ -47,7 +64,6 @@
             <include layout="@layout/item_risk_question" android:id="@+id/qSedentary" />
             <include layout="@layout/item_risk_question" android:id="@+id/qAlcohol" />
             <include layout="@layout/item_risk_question" android:id="@+id/qKidneyDisease" />
-
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubmit"
