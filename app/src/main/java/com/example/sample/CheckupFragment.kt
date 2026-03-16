@@ -52,7 +52,7 @@ class CheckupFragment : Fragment() {
 
         // LOCKING controls initially
         calendarView.isEnabled = false
-        // Note: CalendarView doesn't visually "disable" well, so we rely on the listener logic below
+
         toggleTimeSelection(radioGroupTime, false)
 
         //  Doctor is Selected
