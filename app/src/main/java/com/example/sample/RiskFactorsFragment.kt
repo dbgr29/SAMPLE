@@ -135,14 +135,14 @@ class RiskFactorsFragment : Fragment() {
         // Launch a background thread for the network request
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1. Convert our SQLite Map to a JSON Object
+                // Convert our SQLite Map to a JSON Object
                 val jsonObject = JSONObject()
                 for ((key, value) in answers) {
                     jsonObject.put(key, value)
                 }
                 val jsonString = jsonObject.toString()
 
-                // 2. Connect to Python Server (CHANGE THIS IP ADDRESS TO YOUR LAPTOP'S IP!)
+                // Connect to Python Server (CHANGE THIS IP ADDRESS TO YOUR LAPTOP'S IP!)
                 val url = URL("http://192.168.1.15:5000/predict_risk")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
@@ -150,7 +150,7 @@ class RiskFactorsFragment : Fragment() {
                 connection.setRequestProperty("Accept", "application/json")
                 connection.doOutput = true
 
-                // 3. Send the JSON Data
+                // Send the JSON Data
                 connection.outputStream.use { os ->
                     val input = jsonString.toByteArray(Charsets.UTF_8)
                     os.write(input, 0, input.size)
