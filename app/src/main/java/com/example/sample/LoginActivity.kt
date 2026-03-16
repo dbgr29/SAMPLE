@@ -21,36 +21,28 @@ class LoginActivity : AppCompatActivity() {
         val btnLogin = findViewById<MaterialButton>(R.id.btnLogin)
         val tvSignUp = findViewById<TextView>(R.id.tvSignUp)
 
+        val dbHelper = DatabaseHelper(this)
+
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
-            layoutEmail.error = null
-            layoutPassword.error = null
-
-            // We still make sure they typed *something*
-            if (email.isEmpty()) {
-                layoutEmail.error = "Email is required"
-                return@setOnClickListener
-            }
-            if (password.isEmpty()) {
-                layoutPassword.error = "Password is required"
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // --- ALL VALIDATION REMOVED ---
-            // Any text entered will immediately succeed.
+            // Check Database
+            if (dbHelper.checkUser(email, password)) {
+                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
 
-            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-
-            // Create an Intent to navigate to MainActivity
-            val intent = Intent(this, MainActivity::class.java)
-
-            // Put the user's email as an extra in the Intent
-            intent.putExtra("USER_EMAIL", email)
-
-            startActivity(intent)
-            finish() // Prevents going back to the login screen
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("USER_EMAIL", email)
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // SIGN UP TEXT LOGIC

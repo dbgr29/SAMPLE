@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.net.toUri
 
 class HomeFragment : Fragment() {
 
@@ -54,6 +57,25 @@ class HomeFragment : Fragment() {
         val cardRiskFactors = view.findViewById<View>(R.id.cardRiskFactors)
         cardRiskFactors?.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_riskFactors)
+        }
+
+        // --- DYNAMICALLY LOAD USER PROFILE ---
+        val dbHelper = DatabaseHelper(requireContext())
+        val userEmail = requireActivity().intent.getStringExtra("USER_EMAIL")
+
+        if (userEmail != null) {
+            val userData = dbHelper.getUserData(userEmail)
+            if (userData != null) {
+                // Set Name
+                view.findViewById<TextView>(R.id.tvName).text = userData["name"]
+
+                // Set Profile Image
+                val imageUriString = userData["image_uri"]
+                if (!imageUriString.isNullOrEmpty()) {
+                    val uri = imageUriString.toUri()
+                    view.findViewById<ImageView>(R.id.imgProfile).setImageURI(uri)
+                }
+            }
         }
     }
 }

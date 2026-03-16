@@ -52,6 +52,48 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
 
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgProfileUpload"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_camera_24"
+            android:background="#E0E0E0"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:layout_constraintBottom_toTopOf="@id/layoutName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap to upload picture"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/imgProfileUpload"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutName"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:hint="Full Name"
+            app:boxStrokeColor="@color/primaryPink"
+            app:hintTextColor="@color/primaryPink"
+            app:layout_constraintBottom_toTopOf="@id/layoutEmail"
+            app:layout_constraintTop_toBottomOf="@id/imgProfileUpload">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layoutEmail"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
