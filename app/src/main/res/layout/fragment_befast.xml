@@ -55,8 +55,7 @@
                         android:layout_height="wrap_content"
                         android:text="SPOT A STROKE"
                         android:textColor="#D81B60"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:textSize="22sp" android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
