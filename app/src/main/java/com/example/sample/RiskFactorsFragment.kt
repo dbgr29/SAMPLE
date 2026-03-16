@@ -85,7 +85,7 @@ class RiskFactorsFragment : Fragment() {
         tvQuestion.text = questionText
     }
 
-    // Returns an Integer (1, 0, or -1 for unanswered)
+    // Returns Int (1, 0, or -1 for unanswered)
     private fun getAnswerAsInt(parentView: View, includeId: Int): Int {
         val questionLayout = parentView.findViewById<View>(includeId)
         val radioGroup = questionLayout.findViewById<RadioGroup>(R.id.radioGroup)
