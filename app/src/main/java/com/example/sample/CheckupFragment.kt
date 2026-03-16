@@ -61,7 +61,7 @@ class CheckupFragment : Fragment() {
 
             calendarView.isEnabled = true
 
-            
+
             tvDateStatus.text = "Checking schedule for $selectedDoctor..."
             tvDateStatus.setTextColor(resources.getColor(android.R.color.darker_gray, null))
 
