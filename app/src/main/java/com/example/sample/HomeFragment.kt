@@ -1,5 +1,7 @@
 package com.example.sample
 
+import android.content.Intent
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
+
 
 class HomeFragment : Fragment() {
 
@@ -27,6 +30,24 @@ class HomeFragment : Fragment() {
         val btnCamera = view.findViewById<FloatingActionButton>(R.id.btnCamera)
         btnCamera?.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_scan)
+        }
+
+        // SETUP MENU BUTTON (Developer Credits & Restart)
+        val btnMenu = view.findViewById<ImageView>(R.id.btnMenu)
+        btnMenu?.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("DeTechStroke")
+                .setMessage("Developers:\nGabriel Garcia\nPhoebe Andrei Quan\nNatsuki Ushijima\n\n© 2026 All Rights Reserved.")
+                .setPositiveButton("Restart App") { _, _ ->
+                    // This logic gets the default launch activity (your Splash/Login screen)
+                    // and clears the entire backstack so the app truly restarts.
+                    val intent = requireContext().packageManager.getLaunchIntentForPackage(requireContext().packageName)
+                    intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
+                .setNegativeButton("Close", null) // Just closes the dialog
+                .show()
         }
 
 
