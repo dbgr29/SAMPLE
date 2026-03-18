@@ -40,14 +40,14 @@ class CheckupFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // INIT VALS
+
         val dropdownDoctor = view.findViewById<AutoCompleteTextView>(R.id.dropdownDoctor)
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
         val tvDateStatus = view.findViewById<TextView>(R.id.tvDateStatus)
         val radioGroupTime = view.findViewById<RadioGroup>(R.id.radioGroupTime)
         val btnAddDoctor = view.findViewById<MaterialButton>(R.id.btnAddDoctor)
 
-        //  Dropdown
+    
         setupDropdown(dropdownDoctor)
 
         // LOCKING controls initially
