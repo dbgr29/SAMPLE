@@ -24,11 +24,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
-import com.google.android.libraries.places.api.net.SearchNearbyRequest
-
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 
 class HospitalMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -131,24 +129,20 @@ class HospitalMapFragment : Fragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun fetchNearestHospitalFromPlacesAPI(userLocation: LatLng) {
-        // We want the Place's Name, Coordinates, and Phone Number
-        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHONE_NUMBER)
+        // FindCurrentPlaceRequest is the standard way to find nearby places in newer SDK versions
+        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHONE_NUMBER, Place.Field.TYPES)
+        val request = FindCurrentPlaceRequest.newInstance(placeFields)
 
-        // Define a search area: 5000 meters (5km) radius around the user
-        val circle = CircularBounds.newInstance(userLocation, 5000.0)
-
-        val searchNearbyRequest = SearchNearbyRequest.builder(circle, placeFields)
-            .setIncludedTypes(listOf("hospital")) // Strictly filter for hospitals
-            .setMaxResultCount(5) // Grab the top 5 closest
-            .build()
-
-        placesClient.searchNearby(searchNearbyRequest)
+        placesClient.findCurrentPlace(request)
             .addOnSuccessListener { response ->
-                val places = response.places
-                if (places.isNotEmpty()) {
+                val hospitals = response.placeLikelihoods
+                    .filter { it.place.types?.contains(Place.Type.HOSPITAL) == true }
+                    .sortedBy { it.likelihood } // Likelihood often correlates with proximity here
+                    .reversed()
 
-                    // Plot all found hospitals on the map
-                    for (place in places) {
+                if (hospitals.isNotEmpty()) {
+                    for (likelihood in hospitals) {
+                        val place = likelihood.place
                         place.latLng?.let { latLng ->
                             mMap.addMarker(
                                 MarkerOptions()
@@ -159,9 +153,7 @@ class HospitalMapFragment : Fragment(), OnMapReadyCallback {
                         }
                     }
 
-                    // The Places API usually returns results in order of distance.
-                    // We bind the 1st one (the absolute closest) to the UI.
-                    val nearestHospital = places[0]
+                    val nearestHospital = hospitals[0].place
                     tvNearestHospital.text = "Nearest: ${nearestHospital.name}"
 
                     if (!nearestHospital.phoneNumber.isNullOrEmpty()) {
@@ -171,13 +163,12 @@ class HospitalMapFragment : Fragment(), OnMapReadyCallback {
                         tvNearestHospital.text = "${nearestHospital.name} (No phone listed)"
                         btnCallEmergency.isEnabled = false
                     }
-
                 } else {
-                    tvNearestHospital.text = "No hospitals found within 5km."
+                    tvNearestHospital.text = "No hospitals found nearby."
                 }
             }
             .addOnFailureListener { exception ->
-                Toast.makeText(requireContext(), "Error finding hospitals. Check internet connection.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error finding hospitals: ${exception.message}", Toast.LENGTH_LONG).show()
             }
     }
 }
