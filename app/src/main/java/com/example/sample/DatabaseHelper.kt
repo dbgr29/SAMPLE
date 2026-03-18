@@ -8,270 +8,201 @@ import android.database.sqlite.SQLiteOpenHelper
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "StrokeApp.db"
-        private const val DATABASE_VERSION = 6 // Upgraded to 6 for the BloodChem table
+        private const val DATABASE_NAME = "DeTechStroke.db"
+        private const val DATABASE_VERSION = 1
 
-        private const val TABLE_RISK_FACTORS = "RiskFactors"
-        private const val COL_ID = "id"
-        private const val COL_GENDER = "gender"
-        private const val COL_AGE = "age"
-        private const val COL_HYPERTENSION = "hypertension"
-        private const val COL_HEART_DISEASE = "heart_disease"
-        private const val COL_EVER_MARRIED = "ever_married"
-        private const val COL_WORK_TYPE = "work_type"
-        private const val COL_RESIDENCE = "Residence_type"
-        private const val COL_GLUCOSE = "avg_glucose_level"
-        private const val COL_BMI = "bmi"
-        private const val COL_SMOKING = "smoking_status"
-        private const val COL_SYNCED = "is_synced_to_cloud"
-
-        private const val TABLE_USERS = "Users"
+        // --- 1. USER TABLE (Hybrid: ERD + Auth) ---
+        private const val TABLE_USER = "User"
+        private const val COL_USER_ID = "user_id"
+        private const val COL_USER_NAME = "user_name"
         private const val COL_EMAIL = "email"
         private const val COL_PASSWORD = "password"
-        private const val COL_NAME = "name"
         private const val COL_IMAGE_URI = "image_uri"
+        private const val COL_AGE = "age"
+        private const val COL_SEX = "sex"
 
-        private const val TABLE_VITALS = "Vitals"
-        private const val COL_SYSTOLIC = "systolic"
-        private const val COL_DIASTOLIC = "diastolic"
-        private const val COL_HEIGHT = "height"
-        private const val COL_WEIGHT = "weight"
+        // --- 2. HEALTH RISK FACTOR PROFILE TABLE ---
+        private const val TABLE_HEALTH_PROFILE = "HealthRiskFactorProfile"
+        private const val COL_PROFILE_ID = "profile_id"
+        private const val COL_HYPERTENSION = "hypertension"
+        private const val COL_DIABETES = "diabetes"
+        private const val COL_SMOKER = "smoker"
+        private const val COL_CHOLESTEROL = "cholesterol_level"
+        private const val COL_STROKE_HISTORY = "stroke_history"
+        private const val COL_CARDIAC_DISEASE = "cardiac_disease"
+        private const val COL_OBESE = "obese"
+        private const val COL_UNHEALTHY_DIET = "unhealthy_diet"
+        private const val COL_PHYSICAL_INABILITY = "physical_inability"
+        private const val COL_ALCOHOLIC = "alcoholic"
+        private const val COL_BMI = "bmi"
 
-        // --- NEW BLOOD CHEM TABLE CONSTANTS ---
-        private const val TABLE_BLOOD_CHEM = "BloodChem"
-        private const val COL_TOTAL_CHOL = "total_cholesterol"
-        private const val COL_HDL = "hdl"
-        private const val COL_LDL = "ldl"
-        private const val COL_TRIGLYCERIDES = "triglycerides"
-        private const val COL_FBS = "fbs"
+        // --- 3. EMERGENCY CONTACTS TABLE ---
+        private const val TABLE_EMERGENCY_CONTACTS = "EmergencyContacts"
+        private const val COL_CONTACT_ID = "contact_id"
+        private const val COL_PHONE_NUMBER = "phone_number"
+
+        // --- 4. FACIAL SCAN SCHEDULE TABLE ---
+        private const val TABLE_SCAN_SCHEDULE = "FacialScanSchedule"
+        private const val COL_SCHED_ID = "sched_id"
+        private const val COL_SCHEDULE = "schedule"
+        private const val COL_COMPLETED = "completed"
+
+        // --- 5. FACIAL SCAN RESULT TABLE ---
+        private const val TABLE_SCAN_RESULT = "FacialScanResult"
+        private const val COL_SCAN_ID = "scan_id"
+        private const val COL_ASYMMETRIC_DETECTED = "asymmetric_detected"
+        private const val COL_CONFIDENCE = "confidence"
+        private const val COL_TIMESTAMP = "timestamp"
+
+        // --- 6. RISK ASSESSMENT RESULT TABLE ---
+        private const val TABLE_RISK_ASSESSMENT = "RiskAssessmentResult"
+        private const val COL_RISK_ID = "risk_id"
+        private const val COL_LR_PREDICTION = "lr_prediction"
+        private const val COL_RISK_LEVEL = "risk_level"
+    }
+
+    override fun onConfigure(db: SQLiteDatabase) {
+        super.onConfigure(db)
+        db.setForeignKeyConstraintsEnabled(true)
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable = ("CREATE TABLE $TABLE_RISK_FACTORS ("
-                + "$COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "$COL_GENDER TEXT,"
-                + "$COL_AGE REAL,"
-                + "$COL_HYPERTENSION INTEGER,"
-                + "$COL_HEART_DISEASE INTEGER,"
-                + "$COL_EVER_MARRIED TEXT,"
-                + "$COL_WORK_TYPE TEXT,"
-                + "$COL_RESIDENCE TEXT,"
-                + "$COL_GLUCOSE REAL,"
-                + "$COL_BMI REAL,"
-                + "$COL_SMOKING TEXT,"
-                + "$COL_SYNCED INTEGER DEFAULT 0)")
-        db.execSQL(createTable)
-
-        val createUsersTable = ("CREATE TABLE $TABLE_USERS ("
-                + "$COL_EMAIL TEXT PRIMARY KEY,"
+        // 1. Create User Table (Now includes email & password for local auth)
+        val createUserTable = ("CREATE TABLE $TABLE_USER ("
+                + "$COL_USER_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_NAME TEXT,"
+                + "$COL_EMAIL TEXT UNIQUE,"
                 + "$COL_PASSWORD TEXT,"
-                + "$COL_NAME TEXT,"
-                + "$COL_IMAGE_URI TEXT)")
-        db.execSQL(createUsersTable)
+                + "$COL_IMAGE_URI TEXT,"
+                + "$COL_AGE INTEGER," // Can be updated later in the profile
+                + "$COL_SEX TEXT)")   // Can be updated later in the profile
+        db.execSQL(createUserTable)
 
-        val createVitalsTable = ("CREATE TABLE $TABLE_VITALS ("
-                + "$COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "$COL_SYSTOLIC INTEGER,"
-                + "$COL_DIASTOLIC INTEGER,"
-                + "$COL_HEIGHT INTEGER,"
-                + "$COL_WEIGHT INTEGER)")
-        db.execSQL(createVitalsTable)
+        val createHealthProfileTable = ("CREATE TABLE $TABLE_HEALTH_PROFILE ("
+                + "$COL_PROFILE_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_ID INTEGER UNIQUE,"
+                + "$COL_HYPERTENSION INTEGER,"
+                + "$COL_DIABETES INTEGER,"
+                + "$COL_SMOKER INTEGER,"
+                + "$COL_CHOLESTEROL REAL,"
+                + "$COL_STROKE_HISTORY INTEGER,"
+                + "$COL_CARDIAC_DISEASE INTEGER,"
+                + "$COL_OBESE INTEGER,"
+                + "$COL_UNHEALTHY_DIET INTEGER,"
+                + "$COL_PHYSICAL_INABILITY INTEGER,"
+                + "$COL_ALCOHOLIC INTEGER,"
+                + "$COL_BMI REAL,"
+                + "FOREIGN KEY($COL_USER_ID) REFERENCES $TABLE_USER($COL_USER_ID) ON DELETE CASCADE)")
+        db.execSQL(createHealthProfileTable)
 
-        // --- CREATE BLOOD CHEM TABLE ---
-        val createBloodChemTable = ("CREATE TABLE $TABLE_BLOOD_CHEM ("
-                + "$COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "$COL_TOTAL_CHOL INTEGER,"
-                + "$COL_HDL INTEGER,"
-                + "$COL_LDL INTEGER,"
-                + "$COL_TRIGLYCERIDES INTEGER,"
-                + "$COL_FBS INTEGER)")
-        db.execSQL(createBloodChemTable)
+        val createEmergencyContactsTable = ("CREATE TABLE $TABLE_EMERGENCY_CONTACTS ("
+                + "$COL_CONTACT_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_ID INTEGER,"
+                + "$COL_PHONE_NUMBER TEXT,"
+                + "FOREIGN KEY($COL_USER_ID) REFERENCES $TABLE_USER($COL_USER_ID) ON DELETE CASCADE)")
+        db.execSQL(createEmergencyContactsTable)
+
+        val createScanScheduleTable = ("CREATE TABLE $TABLE_SCAN_SCHEDULE ("
+                + "$COL_SCHED_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_ID INTEGER,"
+                + "$COL_SCHEDULE TEXT,"
+                + "$COL_COMPLETED INTEGER DEFAULT 0,"
+                + "FOREIGN KEY($COL_USER_ID) REFERENCES $TABLE_USER($COL_USER_ID) ON DELETE CASCADE)")
+        db.execSQL(createScanScheduleTable)
+
+        val createScanResultTable = ("CREATE TABLE $TABLE_SCAN_RESULT ("
+                + "$COL_SCAN_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_ID INTEGER,"
+                + "$COL_ASYMMETRIC_DETECTED INTEGER,"
+                + "$COL_CONFIDENCE REAL,"
+                + "$COL_TIMESTAMP TEXT,"
+                + "FOREIGN KEY($COL_USER_ID) REFERENCES $TABLE_USER($COL_USER_ID) ON DELETE CASCADE)")
+        db.execSQL(createScanResultTable)
+
+        val createRiskAssessmentTable = ("CREATE TABLE $TABLE_RISK_ASSESSMENT ("
+                + "$COL_RISK_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "$COL_USER_ID INTEGER,"
+                + "$COL_LR_PREDICTION REAL,"
+                + "$COL_RISK_LEVEL TEXT,"
+                + "$COL_TIMESTAMP TEXT,"
+                + "FOREIGN KEY($COL_USER_ID) REFERENCES $TABLE_USER($COL_USER_ID) ON DELETE CASCADE)")
+        db.execSQL(createRiskAssessmentTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_RISK_FACTORS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_VITALS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_BLOOD_CHEM") // Add this
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_RISK_ASSESSMENT")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SCAN_RESULT")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SCAN_SCHEDULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_EMERGENCY_CONTACTS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_HEALTH_PROFILE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
         onCreate(db)
     }
 
-    // --- USER FUNCTIONS ---
+    // ==========================================
+    // AUTHENTICATION & UI HELPERS
+    // ==========================================
+
     fun registerUser(email: String, password: String, name: String, imageUri: String): Boolean {
         val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
+
+        // Check if email already exists
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_USER WHERE $COL_EMAIL = ?", arrayOf(email))
+        if (cursor.count > 0) {
+            cursor.close()
+            return false // Email exists
+        }
+        cursor.close()
+
+        val values = ContentValues().apply {
+            put(COL_USER_NAME, name)
             put(COL_EMAIL, email)
             put(COL_PASSWORD, password)
-            put(COL_NAME, name)
             put(COL_IMAGE_URI, imageUri)
         }
-        val result = db.insert(TABLE_USERS, null, contentValues)
+        val result = db.insert(TABLE_USER, null, values)
         db.close()
         return result != -1L
     }
 
-    fun checkUser(email: String, password: String): Boolean {
+    // Returns the user_id if successful, or -1 if failed
+    fun authenticateUser(email: String, password: String): Long {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_USERS WHERE $COL_EMAIL=? AND $COL_PASSWORD=?", arrayOf(email, password))
-        val count = cursor.count
+        val cursor = db.rawQuery("SELECT $COL_USER_ID FROM $TABLE_USER WHERE $COL_EMAIL = ? AND $COL_PASSWORD = ?", arrayOf(email, password))
+
+        var userId = -1L
+        if (cursor.moveToFirst()) {
+            userId = cursor.getLong(0)
+        }
         cursor.close()
-        db.close()
-        return count > 0
+        return userId
     }
 
-    fun getUserData(email: String): Map<String, String>? {
+    fun getUserData(userId: Long): Map<String, String>? {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT $COL_NAME, $COL_IMAGE_URI FROM $TABLE_USERS WHERE $COL_EMAIL=?", arrayOf(email))
+        val cursor = db.rawQuery("SELECT $COL_USER_NAME, $COL_IMAGE_URI FROM $TABLE_USER WHERE $COL_USER_ID = ?", arrayOf(userId.toString()))
+
         var userData: Map<String, String>? = null
         if (cursor.moveToFirst()) {
             userData = mapOf(
-                "name" to cursor.getString(0),
-                "image_uri" to cursor.getString(1)
+                "name" to (cursor.getString(0) ?: "User"),
+                "image_uri" to (cursor.getString(1) ?: "")
             )
         }
         cursor.close()
-        db.close()
         return userData
     }
 
-    // --- RISK FACTOR FUNCTIONS ---
-    fun insertRiskFactors(answers: Map<String, Any>): Boolean {
-        val db = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(COL_GENDER, answers["gender"] as String)
-        contentValues.put(COL_AGE, answers["age"] as Double)
-        contentValues.put(COL_HYPERTENSION, answers["hypertension"] as Int)
-        contentValues.put(COL_HEART_DISEASE, answers["heart_disease"] as Int)
-        contentValues.put(COL_EVER_MARRIED, answers["ever_married"] as String)
-        contentValues.put(COL_WORK_TYPE, answers["work_type"] as String)
-        contentValues.put(COL_RESIDENCE, answers["Residence_type"] as String)
-        contentValues.put(COL_GLUCOSE, answers["avg_glucose_level"] as Double)
-        contentValues.put(COL_BMI, answers["bmi"] as Double)
-        contentValues.put(COL_SMOKING, answers["smoking_status"] as String)
-        contentValues.put(COL_SYNCED, 0)
-
-        val result = db.insert(TABLE_RISK_FACTORS, null, contentValues)
-        db.close()
-        return result != -1L
-    }
-
-    // --- VITALS FUNCTIONS ---
-    fun insertVitals(systolic: Int, diastolic: Int, height: Int, weight: Int): Boolean {
-        val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(COL_SYSTOLIC, systolic)
-            put(COL_DIASTOLIC, diastolic)
-            put(COL_HEIGHT, height)
-            put(COL_WEIGHT, weight)
-        }
-        val result = db.insert(TABLE_VITALS, null, contentValues)
-        db.close()
-        return result != -1L
-    }
-
-    // --- NEW: BLOOD CHEM FUNCTIONS ---
-    fun insertBloodChem(totalChol: Int, hdl: Int, ldl: Int, triglycerides: Int, fbs: Int): Boolean {
-        val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(COL_TOTAL_CHOL, totalChol)
-            put(COL_HDL, hdl)
-            put(COL_LDL, ldl)
-            put(COL_TRIGLYCERIDES, triglycerides)
-            put(COL_FBS, fbs)
-        }
-        val result = db.insert(TABLE_BLOOD_CHEM, null, contentValues)
-        db.close()
-        return result != -1L
-    }
-
-    // --- DYNAMIC SUMMARY GENERATOR ---
-    fun getUserHealthSummary(): String {
+    fun getUserHealthSummary(userId: Long): String {
         val db = this.readableDatabase
-        var age = "--"
-        var gender = "--"
-        var bmi = "--"
-        var bp = "--/--"
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_HEALTH_PROFILE WHERE $COL_USER_ID = ?", arrayOf(userId.toString()))
 
-        val cursorRisk = db.rawQuery("SELECT $COL_AGE, $COL_GENDER, $COL_BMI FROM $TABLE_RISK_FACTORS ORDER BY $COL_ID DESC LIMIT 1", null)
-        if (cursorRisk.moveToFirst()) {
-            val ageVal = cursorRisk.getDouble(0)
-            age = if (ageVal > 0) ageVal.toInt().toString() else "--"
-            gender = cursorRisk.getString(1) ?: "--"
-            val bmiVal = cursorRisk.getDouble(2)
-            bmi = if (bmiVal > 0) String.format("%.1f", bmiVal) else "--"
-        }
-        cursorRisk.close()
-
-        val cursorVitals = db.rawQuery("SELECT $COL_SYSTOLIC, $COL_DIASTOLIC FROM $TABLE_VITALS ORDER BY $COL_ID DESC LIMIT 1", null)
-        if (cursorVitals.moveToFirst()) {
-            val sys = cursorVitals.getInt(0)
-            val dia = cursorVitals.getInt(1)
-            bp = "$sys/$dia"
-        }
-        cursorVitals.close()
-        db.close()
-
-        return "$age, $gender | BMI: $bmi | BP: $bp"
-    }
-
-    fun getFullUserProfile(email: String): Map<String, String> {
-        val db = this.readableDatabase
-        val profile = mutableMapOf<String, String>()
-
-        val cursorUser = db.rawQuery("SELECT $COL_NAME, $COL_EMAIL, $COL_IMAGE_URI FROM $TABLE_USERS WHERE $COL_EMAIL=?", arrayOf(email))
-        if (cursorUser.moveToFirst()) {
-            profile["name"] = cursorUser.getString(0) ?: "Unknown"
-            profile["email"] = cursorUser.getString(1) ?: "Unknown"
-            profile["image_uri"] = cursorUser.getString(2) ?: ""
-        }
-        cursorUser.close()
-
-        val cursorRisk = db.rawQuery("SELECT $COL_AGE, $COL_GENDER, $COL_BMI, $COL_SMOKING FROM $TABLE_RISK_FACTORS ORDER BY $COL_ID DESC LIMIT 1", null)
-        if (cursorRisk.moveToFirst()) {
-            profile["age"] = cursorRisk.getDouble(0).toInt().toString()
-            profile["gender"] = cursorRisk.getString(1) ?: "--"
-            profile["bmi"] = String.format("%.1f", cursorRisk.getDouble(2))
-            profile["smoking"] = cursorRisk.getString(3) ?: "--"
+        val summary = if (cursor.moveToFirst()) {
+            "Health Profile Configured. Tap to view."
         } else {
-            profile["age"] = "--"; profile["gender"] = "--"; profile["bmi"] = "--"; profile["smoking"] = "--"
+            "No health data available. Please complete your checkup."
         }
-        cursorRisk.close()
-
-        val cursorVitals = db.rawQuery("SELECT $COL_SYSTOLIC, $COL_DIASTOLIC, $COL_HEIGHT, $COL_WEIGHT FROM $TABLE_VITALS ORDER BY $COL_ID DESC LIMIT 1", null)
-        if (cursorVitals.moveToFirst()) {
-            profile["bp"] = "${cursorVitals.getInt(0)}/${cursorVitals.getInt(1)}"
-            profile["height"] = cursorVitals.getInt(2).toString()
-            profile["weight"] = cursorVitals.getInt(3).toString()
-        } else {
-            profile["bp"] = "--/--"; profile["height"] = "--"; profile["weight"] = "--"
-        }
-        cursorVitals.close()
-
-
-        db.close()
-
-
-        // 4. Blood Chemistry (Total Chol, HDL, LDL, Triglycerides, FBS)
-        val cursorBloodChem = db.rawQuery("SELECT $COL_TOTAL_CHOL, $COL_HDL, $COL_LDL, $COL_TRIGLYCERIDES, $COL_FBS FROM $TABLE_BLOOD_CHEM ORDER BY $COL_ID DESC LIMIT 1", null)
-        if (cursorBloodChem.moveToFirst()) {
-            profile["total_chol"] = cursorBloodChem.getInt(0).toString()
-            profile["hdl"] = cursorBloodChem.getInt(1).toString()
-            profile["ldl"] = cursorBloodChem.getInt(2).toString()
-            profile["triglycerides"] = cursorBloodChem.getInt(3).toString()
-            profile["fbs"] = cursorBloodChem.getInt(4).toString()
-        } else {
-            profile["total_chol"] = "--"
-            profile["hdl"] = "--"
-            profile["ldl"] = "--"
-            profile["triglycerides"] = "--"
-            profile["fbs"] = "--"
-        }
-        cursorBloodChem.close()
-        db.close()
-
-        return profile
+        cursor.close()
+        return summary
     }
-
-
-
-    }
+}
