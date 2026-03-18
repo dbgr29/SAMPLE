@@ -15,7 +15,6 @@ class SignUpActivity : AppCompatActivity() {
     private var selectedImageUri: Uri? = null
     private lateinit var imgProfileUpload: ShapeableImageView
 
-    // This opens the Android photo gallery
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedImageUri = it
@@ -35,7 +34,6 @@ class SignUpActivity : AppCompatActivity() {
         val btnSignUp = findViewById<MaterialButton>(R.id.btnSignUp)
         imgProfileUpload = findViewById(R.id.imgProfileUpload)
 
-        // Open gallery when picture is tapped
         imgProfileUpload.setOnClickListener {
             pickImage.launch("image/*")
         }
@@ -47,7 +45,6 @@ class SignUpActivity : AppCompatActivity() {
             val imageUriString = selectedImageUri?.toString() ?: ""
 
             if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                // Save to SQLite Database
                 val isInserted = dbHelper.registerUser(email, password, name, imageUriString)
 
                 if (isInserted) {
