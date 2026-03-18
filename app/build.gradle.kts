@@ -73,10 +73,10 @@ dependencies {
     // Google Maps
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
-    // Google Location Services (to find the user's current spot)
-    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 
-    // Google Places SDK (to find the hospitals)
     implementation("com.google.android.libraries.places:places:3.3.0")
+
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 
 }
