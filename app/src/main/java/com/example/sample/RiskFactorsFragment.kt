@@ -37,7 +37,7 @@ class RiskFactorsFragment : Fragment() {
     private lateinit var dbHelper: DatabaseHelper
     private val appThemeColor = "#D81B60".toColorInt()
 
-    // Kaggle Specific String Options
+    // Specific text options expected by the Kaggle model
     private val genderOptions = arrayOf("Male", "Female", "Other")
     private val workOptions = arrayOf("Private", "Self-employed", "Govt_job", "children", "Never_worked")
     private val smokingOptions = arrayOf("formerly smoked", "never smoked", "smokes", "Unknown")
@@ -53,15 +53,15 @@ class RiskFactorsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         dbHelper = DatabaseHelper(requireContext())
 
-        // --- Setup Spinners (Dropdowns) ---
+        // Setup Spinners
         view.findViewById<Spinner>(R.id.spinGender).adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, genderOptions)
         view.findViewById<Spinner>(R.id.spinWork).adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, workOptions)
         view.findViewById<Spinner>(R.id.spinSmoking).adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, smokingOptions)
 
-        // --- Setup Buttons ---
         view.findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener { findNavController().popBackStack() }
         view.findViewById<MaterialButton>(R.id.btnSubmit).setOnClickListener { submitForm(view) }
 
+        // Navigation
         view.findViewById<FloatingActionButton>(R.id.btnCamera)?.setOnClickListener { findNavController().navigate(R.id.action_home_to_scan) }
         view.findViewById<ImageView>(R.id.btnHome)?.setOnClickListener { findNavController().popBackStack(R.id.homeFragment, false) }
     }
@@ -87,14 +87,13 @@ class RiskFactorsFragment : Fragment() {
         val everMarried = getRadioString(view, R.id.rgMarried)
         val residence = getRadioString(view, R.id.rgResidence)
 
-        // Validation: Prevent submitting empty fields
         if (ageText.isEmpty() || glucoseText.isEmpty() || bmiText.isEmpty() ||
             hypertension == null || heartDisease == null || everMarried == null || residence == null) {
             Toast.makeText(requireContext(), "Please answer all questions before submitting.", Toast.LENGTH_LONG).show()
             return
         }
 
-        // Map data perfectly to the Kaggle columns using 'Any' to hold both Strings and Doubles
+        // Map data perfectly to what DatabaseHelper (and Kaggle) expects
         val answers = mapOf<String, Any>(
             "gender" to view.findViewById<Spinner>(R.id.spinGender).selectedItem.toString(),
             "age" to ageText.toDouble(),
@@ -108,7 +107,7 @@ class RiskFactorsFragment : Fragment() {
             "smoking_status" to view.findViewById<Spinner>(R.id.spinSmoking).selectedItem.toString()
         )
 
-        // Save Locally and Sync
+        // Save Locally in SQLite
         if (dbHelper.insertRiskFactors(answers)) {
             syncToDoctorDatabase(answers)
         } else {
@@ -121,13 +120,12 @@ class RiskFactorsFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Convert Map to JSON
                 val jsonObject = JSONObject()
                 for ((key, value) in answers) {
                     jsonObject.put(key, value)
                 }
 
-                // Change IP back to your laptop IP!
+                // REMEMBER: Verify your laptop's Wi-Fi IP address!
                 val url = URL("http://192.168.1.15:5000/predict_risk")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
@@ -182,10 +180,11 @@ class RiskFactorsFragment : Fragment() {
         return MaterialAlertDialogBuilder(requireContext()).setView(layout).setCancelable(false).show()
     }
 
+
     private fun showThemedResultDialog(riskPercentage: Int) {
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Assessment Complete")
-            .setMessage("Based on your risk factors, your stroke probability is $riskPercentage%.\n\nThis data has been successfully securely synced to your doctor's Admin Database.")
+            .setMessage("Based on your risk factors, your stroke risk is $riskPercentage%.\n\nThis data has been successfully securely synced to your doctor's Admin Database.")
             .setPositiveButton("Back to Home") { _, _ -> findNavController().popBackStack(R.id.homeFragment, false) }
             .setCancelable(false)
             .show()

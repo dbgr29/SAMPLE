@@ -46,46 +46,54 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1. Gender" android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="Please enter your exact medical metrics for the AI stroke prediction model."
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1. Gender" android:textColor="#333333" android:textStyle="bold" />
             <Spinner android:id="@+id/spinGender" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" />
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2. Age" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2. Age" android:textColor="#333333" android:textStyle="bold" />
             <EditText android:id="@+id/etAge" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="e.g. 45" android:layout_marginBottom="16dp"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3. Hypertension (High Blood Pressure)" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3. Hypertension (High Blood Pressure)" android:textColor="#333333" android:textStyle="bold" />
             <RadioGroup android:id="@+id/rgHypertension" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
                 <RadioButton android:id="@+id/rbHypYes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Yes" android:buttonTint="#D81B60"/>
                 <RadioButton android:id="@+id/rbHypNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No" android:buttonTint="#D81B60"/>
             </RadioGroup>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4. Heart Disease" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4. Heart Disease (Including Atrial Fib/Heart Failure)" android:textColor="#333333" android:textStyle="bold" />
             <RadioGroup android:id="@+id/rgHeart" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
                 <RadioButton android:id="@+id/rbHeartYes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Yes" android:buttonTint="#D81B60"/>
                 <RadioButton android:id="@+id/rbHeartNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No" android:buttonTint="#D81B60"/>
             </RadioGroup>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5. Ever Married?" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5. Ever Married?" android:textColor="#333333" android:textStyle="bold" />
             <RadioGroup android:id="@+id/rgMarried" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
                 <RadioButton android:id="@+id/rbMarYes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Yes" android:buttonTint="#D81B60"/>
                 <RadioButton android:id="@+id/rbMarNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No" android:buttonTint="#D81B60"/>
             </RadioGroup>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6. Work Type" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6. Work Type" android:textColor="#333333" android:textStyle="bold" />
             <Spinner android:id="@+id/spinWork" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" />
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7. Residence Type" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7. Residence Type" android:textColor="#333333" android:textStyle="bold" />
             <RadioGroup android:id="@+id/rgResidence" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
                 <RadioButton android:id="@+id/rbUrban" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Urban" android:buttonTint="#D81B60"/>
                 <RadioButton android:id="@+id/rbRural" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rural" android:buttonTint="#D81B60"/>
             </RadioGroup>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8. Average Glucose Level" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8. Average Glucose Level" android:textColor="#333333" android:textStyle="bold" />
             <EditText android:id="@+id/etGlucose" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="e.g. 105.92" android:layout_marginBottom="16dp"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="9. Body Mass Index (BMI)" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="9. Body Mass Index (BMI)" android:textColor="#333333" android:textStyle="bold" />
             <EditText android:id="@+id/etBmi" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="e.g. 28.5" android:layout_marginBottom="16dp"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10. Smoking Status" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10. Smoking Status" android:textColor="#333333" android:textStyle="bold" />
             <Spinner android:id="@+id/spinSmoking" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" />
 
             <com.google.android.material.button.MaterialButton
