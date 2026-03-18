@@ -16,8 +16,6 @@ class LoginActivity : AppCompatActivity() {
 
         val etEmail = findViewById<TextInputEditText>(R.id.etEmail)
         val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
-        val layoutEmail = findViewById<TextInputLayout>(R.id.layoutEmail)
-        val layoutPassword = findViewById<TextInputLayout>(R.id.layoutPassword)
         val btnLogin = findViewById<MaterialButton>(R.id.btnLogin)
         val tvSignUp = findViewById<TextView>(R.id.tvSignUp)
 
@@ -32,12 +30,14 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Check Database
-            if (dbHelper.checkUser(email, password)) {
+            // Authenticate and retrieve the primary key (user_id)
+            val userId = dbHelper.authenticateUser(email, password)
+
+            if (userId != -1L) {
                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("USER_EMAIL", email)
+                intent.putExtra("USER_ID", userId) // Passing ID instead of Email
                 startActivity(intent)
                 finish()
             } else {
@@ -45,9 +45,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // SIGN UP TEXT LOGIC
         tvSignUp.setOnClickListener {
-            // Navigate to SignUpActivity
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
