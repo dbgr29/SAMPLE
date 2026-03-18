@@ -19,34 +19,15 @@ import java.util.Locale
 // ==========================================
 
 // Maps the Kotlin data into the JSON format expected by your Python Pandas DataFrame
-data class PatientDataPayload(
-    val age: Int,
-    val gender: String,
-    val hypertension: Int,
-    @SerializedName("heart_disease")
-    val heartDisease: Int,
-    val bmi: Double,
-    @SerializedName("smoking_status")
-    val smokingStatus: String
-)
 
-// Maps the {"success": True, "risk_score": 0.75} JSON response from app.py
-data class PredictionResponse(
-    val success: Boolean,
-    @SerializedName("risk_score")
-    val riskScore: Double?,
-    val error: String?
-)
+
+
 
 // ==========================================
 // 2. RETROFIT API INTERFACE
 // ==========================================
 
-interface StrokePredictionApi {
-    // This targets the @app.route('/predict_risk') endpoint in your Flask app
-    @POST("predict_risk")
-    fun getRiskPrediction(@Body patientData: PatientDataPayload): Call<PredictionResponse>
-}
+
 
 // ==========================================
 // 3. MAIN NETWORK HELPER CLASS
