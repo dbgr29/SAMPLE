@@ -205,4 +205,101 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         return summary
     }
+
+    // ==========================================
+    // ERD DATA MAPPING FUNCTIONS
+    // ==========================================
+
+    /**
+     * Because HealthRiskFactorProfile is 1-to-1, we "Upsert" (Insert or Update)
+     * a profile for the specific user.
+     */
+    private fun ensureProfileExists(userId: Long) {
+        val db = this.writableDatabase
+        val cursor = db.rawQuery("SELECT $COL_PROFILE_ID FROM $TABLE_HEALTH_PROFILE WHERE $COL_USER_ID = ?", arrayOf(userId.toString()))
+        if (!cursor.moveToFirst()) {
+            val values = ContentValues().apply { put(COL_USER_ID, userId) }
+            db.insert(TABLE_HEALTH_PROFILE, null, values)
+        }
+        cursor.close()
+    }
+
+    fun updateVitalsToERD(userId: Long, bmi: Double): Boolean {
+        ensureProfileExists(userId)
+        val db = this.writableDatabase
+        val values = ContentValues().apply { put(COL_BMI, bmi) }
+        val rows = db.update(TABLE_HEALTH_PROFILE, values, "$COL_USER_ID = ?", arrayOf(userId.toString()))
+        db.close()
+        return rows > 0
+    }
+
+    fun updateBloodChemToERD(userId: Long, totalCholesterol: Double): Boolean {
+        ensureProfileExists(userId)
+        val db = this.writableDatabase
+        val values = ContentValues().apply { put(COL_CHOLESTEROL, totalCholesterol) }
+        val rows = db.update(TABLE_HEALTH_PROFILE, values, "$COL_USER_ID = ?", arrayOf(userId.toString()))
+        db.close()
+        return rows > 0
+    }
+
+    fun updateRiskFactorsToERD(userId: Long, age: Int, hypertension: Int, cardiacDisease: Int, bmi: Double, smoker: Int, diabetes: Int): Boolean {
+        ensureProfileExists(userId)
+        val db = this.writableDatabase
+
+        // Update Age in User Table
+        val userValues = ContentValues().apply { put(COL_AGE, age) }
+        db.update(TABLE_USER, userValues, "$COL_USER_ID = ?", arrayOf(userId.toString()))
+
+        // Update Health Profile
+        val profileValues = ContentValues().apply {
+            put(COL_HYPERTENSION, hypertension)
+            put(COL_CARDIAC_DISEASE, cardiacDisease)
+            put(COL_BMI, bmi)
+            put(COL_SMOKER, smoker)
+            put(COL_DIABETES, diabetes)
+        }
+        val rows = db.update(TABLE_HEALTH_PROFILE, profileValues, "$COL_USER_ID = ?", arrayOf(userId.toString()))
+        db.close()
+        return rows > 0
+    }
+
+    fun getFullUserProfile(userId: Long): Map<String, String> {
+        val db = this.readableDatabase
+        val map = mutableMapOf<String, String>()
+
+        // Default fallbacks
+        map["name"] = "Unknown"
+        map["email"] = "Unknown"
+        map["age"] = "N/A"
+        map["sex"] = "N/A"
+        map["bmi"] = "N/A"
+        map["cholesterol"] = "N/A"
+        map["hypertension"] = "N/A"
+        map["smoker"] = "N/A"
+        map["image_uri"] = ""
+
+        // Join query based on the ERD relations
+        val query = """
+            SELECT u.$COL_USER_NAME, u.$COL_EMAIL, u.$COL_AGE, u.$COL_SEX, u.$COL_IMAGE_URI,
+                   h.$COL_BMI, h.$COL_CHOLESTEROL, h.$COL_HYPERTENSION, h.$COL_SMOKER
+            FROM $TABLE_USER u
+            LEFT JOIN $TABLE_HEALTH_PROFILE h ON u.$COL_USER_ID = h.$COL_USER_ID
+            WHERE u.$COL_USER_ID = ?
+        """
+
+        val cursor = db.rawQuery(query, arrayOf(userId.toString()))
+        if (cursor.moveToFirst()) {
+            map["name"] = cursor.getString(0) ?: "User"
+            map["email"] = cursor.getString(1) ?: "No Email"
+            map["age"] = cursor.getString(2) ?: "N/A"
+            map["sex"] = cursor.getString(3) ?: "N/A"
+            map["image_uri"] = cursor.getString(4) ?: ""
+            map["bmi"] = cursor.getString(5) ?: "N/A"
+            map["cholesterol"] = cursor.getString(6) ?: "N/A"
+            map["hypertension"] = if (cursor.getInt(7) == 1) "Yes" else "No"
+            map["smoker"] = if (cursor.getInt(8) == 1) "Yes" else "No"
+        }
+        cursor.close()
+        return map
+    }
 }
