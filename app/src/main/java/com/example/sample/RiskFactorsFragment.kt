@@ -144,9 +144,17 @@ class RiskFactorsFragment : Fragment() {
 
                     if (responseJson.getBoolean("success")) {
                         val percentage = (responseJson.getDouble("risk_score") * 100).toInt()
+
                         withContext(Dispatchers.Main) {
                             loadingDialog.dismiss()
-                            showThemedResultDialog(percentage)
+
+
+                            // Create a bundle to pass the calculated percentage to the new Fragment
+                            val bundle = Bundle().apply {
+                                putInt("RISK_PERCENTAGE", percentage)
+                            }
+
+                            findNavController().navigate(R.id.action_riskFactors_to_assessmentResult, bundle)
                         }
                     } else {
                         withContext(Dispatchers.Main) {
@@ -180,14 +188,4 @@ class RiskFactorsFragment : Fragment() {
         return MaterialAlertDialogBuilder(requireContext()).setView(layout).setCancelable(false).show()
     }
 
-
-    private fun showThemedResultDialog(riskPercentage: Int) {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Assessment Complete")
-            .setMessage("Based on your risk factors, your stroke risk is $riskPercentage%.\n\nThis data has been successfully securely synced to your doctor's Admin Database.")
-            .setPositiveButton("Back to Home") { _, _ -> findNavController().popBackStack(R.id.homeFragment, false) }
-            .setCancelable(false)
-            .show()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(appThemeColor)
-    }
 }

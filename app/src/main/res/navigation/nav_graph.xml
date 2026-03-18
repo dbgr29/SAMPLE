@@ -98,4 +98,16 @@
 
     </fragment>
 
+    <action
+        android:id="@+id/action_riskFactors_to_assessmentResult"
+        app:destination="@id/assessmentResultFragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim" />
+
+    <fragment
+        android:id="@+id/assessmentResultFragment"
+        android:name="com.example.sample.AssessmentResultFragment"
+        android:label="Assessment Result"
+        tools:layout="@layout/fragment_assessment_result" />
+
 </navigation>
