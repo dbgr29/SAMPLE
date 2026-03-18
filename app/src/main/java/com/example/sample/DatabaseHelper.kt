@@ -302,4 +302,41 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         return map
     }
+
+    // ==========================================
+    // ASSESSMENT & YOLO SCAN FUNCTIONS
+    // ==========================================
+
+    fun insertRiskAssessment(userId: Long, lrPrediction: Double, riskLevel: String, timestamp: String): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COL_USER_ID, userId)
+            put(COL_LR_PREDICTION, lrPrediction)
+            put(COL_RISK_LEVEL, riskLevel)
+            put(COL_TIMESTAMP, timestamp)
+        }
+        val result = db.insert(TABLE_RISK_ASSESSMENT, null, values)
+        db.close()
+        return result != -1L
+    }
+
+    /**
+     * Retrieves the most recent YOLOv10 scan for a specific user.
+     * Returns a map with "detected" (Boolean) and "timestamp" (String), or null if no scans exist.
+     */
+    fun getLatestFacialScan(userId: Long): Map<String, Any>? {
+        val db = this.readableDatabase
+        // Order by scan_id descending to get the newest one first
+        val cursor = db.rawQuery("SELECT $COL_ASYMMETRIC_DETECTED, $COL_TIMESTAMP FROM $TABLE_SCAN_RESULT WHERE $COL_USER_ID = ? ORDER BY $COL_SCAN_ID DESC LIMIT 1", arrayOf(userId.toString()))
+
+        var scanData: Map<String, Any>? = null
+        if (cursor.moveToFirst()) {
+            scanData = mapOf(
+                "detected" to (cursor.getInt(0) == 1),
+                "timestamp" to (cursor.getString(1) ?: "Unknown Date")
+            )
+        }
+        cursor.close()
+        return scanData
+    }
 }
