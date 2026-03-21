@@ -39,8 +39,8 @@ class RiskFactorsFragment : Fragment() {
 
     // Specific text options expected by the Kaggle model
     private val genderOptions = arrayOf("Male", "Female", "Other")
-    private val workOptions = arrayOf("Private", "Self-employed", "Govt_job", "children", "Never_worked")
-    private val smokingOptions = arrayOf("formerly smoked", "never smoked", "smokes", "Unknown")
+    private val workOptions = arrayOf("Private", "Self-employed", "Government", "Student", "Never worked")
+    private val smokingOptions = arrayOf("Formerly smoked", "Never smoked", "Smokes")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

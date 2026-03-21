@@ -2,15 +2,14 @@ package com.example.sample
 
 import com.google.gson.annotations.SerializedName
 
-// This maps your Kotlin data into the
-// exact JSON format expected by your Python Pandas DataFrame
+
 data class PatientDataPayload(
     val age: Int,
     val gender: String, // e.g., "Male" or "Female"
     val hypertension: Int, // 1 or 0
 
     @SerializedName("heart_disease")
-    val heartDisease: Int, // Maps to your SQLite cardiac_disease (1 or 0)
+    val heartDisease: Int, // Maps to SQLite cardiac_disease (1 or 0)
 
     val bmi: Double,
 
