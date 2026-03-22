@@ -79,7 +79,7 @@ class BloodChemFragment : Fragment() {
                     Toast.makeText(requireContext(), "Database Error. Could not save.", Toast.LENGTH_SHORT).show()
                 }
             }
-        } 
+        }
 
         // ==========================================
         // Bottom Navigation Setup
