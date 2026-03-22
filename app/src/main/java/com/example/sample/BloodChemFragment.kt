@@ -81,10 +81,11 @@ class BloodChemFragment : Fragment() {
             }
 
         // Bottom Navigation Setup
-        val btnCamera = view.findViewById<FloatingActionButton>(R.id.btnCamera)
-        btnCamera?.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_scan)
-        }
+            val btnCamera = view.findViewById<FloatingActionButton>(R.id.btnCamera)
+            btnCamera?.setOnClickListener {
+                // Directly navigate to the scanner
+                findNavController().navigate(R.id.action_global_scan)
+            }
 
         val btnHome = view.findViewById<ImageView>(R.id.btnHome)
         btnHome?.setOnClickListener {

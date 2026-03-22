@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_home">
 
         <action
+            android:id="@+id/action_global_scan"
+            app:destination="@id/scanFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+
+        <action
             android:id="@+id/action_homeFragment_to_checkupFragment"
             app:destination="@id/checkupFragment"
             app:enterAnim="@anim/nav_default_enter_anim"

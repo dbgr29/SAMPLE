@@ -62,7 +62,8 @@ class VitalsFragment : Fragment() {
         }
         val btnCamera = view.findViewById<FloatingActionButton>(R.id.btnCamera)
         btnCamera?.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_scan)
+            // Directly navigate to the scanner
+            findNavController().navigate(R.id.action_global_scan)
         }
 
         val btnHome = view.findViewById<ImageView>(R.id.btnHome)
